@@ -1,54 +1,46 @@
 import { useEffect, useState } from "react";
-import { getAccessToken } from "./auth.ts";
-import credentials from "./credentials.ts";
-
-const { clientId } = credentials;
-
-const redirectUri = "http://localhost:5173/";
+import { redirectToSpotifyAuthorize } from "./auth.ts";
 
 interface LoginProps {
   onTokenReceived: (token: string) => void;
 }
 
 export default function Login({ onTokenReceived }: LoginProps) {
-  const [accessToken, setAccessToken] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const code = urlParams.get("code");
-
-    if (code) {
-      // Exchange the code for an access token
-      getAccessToken(code).then((token) => {
-        if (token) {
-          setAccessToken(token);
-          onTokenReceived(token); // Pass the token to the parent
-          console.log("Access Token:", token);
-        }
-      });
+  // Handle login button click
+  const handleLogin = async () => {
+    try {
+      setLoading(true);
+      await redirectToSpotifyAuthorize();
+      // No need to set loading to false as we're redirecting away
+    } catch (error) {
+      console.error("Failed to redirect:", error);
+      setError("Failed to start login process. Please try again.");
+      setLoading(false);
     }
-  }, []);
-
-  const scope =
-    "user-read-private user-read-email user-library-read user-library-modify";
-  const url = "https://accounts.spotify.com/authorize?";
-  const params = {
-    response_type: "code",
-    client_id: clientId,
-    scope,
-    redirect_uri: redirectUri,
   };
 
-  const queryString = new URLSearchParams(params).toString();
-  const fullUrl = `${url}${queryString}`;
+  if (loading) {
+    return <div>Redirecting to Spotify...</div>;
+  }
+
+  if (error) {
+    return (
+      <div>
+        <p className="error">{error}</p>
+        <button onClick={handleLogin}>Try Again</button>
+      </div>
+    );
+  }
 
   return (
-    <div>
-      {!accessToken ? (
-        <a href={fullUrl}>Login with Spotify</a>
-      ) : (
-        <p>Logged in successfully!</p>
-      )}
+    <div className="login-container">
+      <p>Welcome to RecordFreak! Connect your Spotify account to view your album collection.</p>
+      <button onClick={handleLogin} className="login-button">
+        Login with Spotify
+      </button>
     </div>
   );
 }

@@ -1,14 +1,8 @@
 import { useEffect, useState } from "react";
+import Featured from "./vendor/Featured.tsx"; // Import the Featured component
+import { Album } from "./types/Album"; // Import the Album interface
 
-interface Album {
-  id: string;
-  name: string;
-  artists: { name: string }[];
-  images: { url: string }[];
-  added_at: string; // Include the added_at field for sorting
-}
-
-export default function AlbumList({ accessToken }: { accessToken: string }) {
+export default function Body({ accessToken }: { accessToken: string }) {
   const [albums, setAlbums] = useState<Album[]>([]);
   const [error, setError] = useState<string | null>(null);
 
@@ -64,7 +58,7 @@ export default function AlbumList({ accessToken }: { accessToken: string }) {
     <div>
       <h2>Saved Albums</h2>
       <div className="album-list">
-        {albums.map((album) => (
+        {albums.slice(-4).map((album) => (
           <div key={album.id} className="album">
             <img src={album.images[0]?.url} alt={album.name} width="100" />
             <h3>{album.name}</h3>
