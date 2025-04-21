@@ -1,0 +1,140 @@
+.album-suggestions-container {
+  margin: 2rem 0;
+}
+
+.suggestion-circles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.suggestion-circle {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background-color: #1DB954; /* Spotify green */
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 1rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  word-break: break-word;
+  overflow: hidden;
+}
+
+.suggestion-circle:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+.suggestion-circle.selected {
+  background-color: #191414; /* Spotify black */
+  transform: scale(1.05);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+.search-results {
+  margin-top: 2rem;
+  padding: 1rem;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.result-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.result-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.5rem;
+  border-radius: 4px;
+  background-color: white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.result-image {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.result-details {
+  flex: 1;
+}
+
+.result-details h4 {
+  margin: 0 0 0.5rem 0;
+}
+
+.result-details p {
+  margin: 0 0 0.5rem 0;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.button-group {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.play-button, .save-button, .saved-button {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 2rem;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 0.8rem;
+  transition: all 0.2s ease;
+}
+
+.play-button {
+  background-color: #1DB954; /* Spotify green */
+  color: white;
+}
+
+.play-button:hover {
+  background-color: #1ED760;
+}
+
+.save-button {
+  background-color: transparent;
+  border: 1px solid #1DB954;
+  color: #1DB954;
+}
+
+.save-button:hover {
+  background-color: rgba(29, 185, 84, 0.1);
+}
+
+.saved-button {
+  background-color: #ddd;
+  color: #666;
+  cursor: default;
+}
+
+.loading {
+  text-align: center;
+  margin: 1rem 0;
+  color: #666;
+}
+
+.error {
+  color: #E22134;
+  padding: 0.5rem;
+  border-radius: 4px;
+  margin: 1rem 0;
+}
