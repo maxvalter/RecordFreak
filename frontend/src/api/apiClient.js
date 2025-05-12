@@ -31,6 +31,7 @@ async function fetchWithAuth(endpoint, options = {}) {
 
     // Parse and return the response data
     return await response.json();
+  
   } catch (error) {
     console.error('API request failed:', error);
     throw error;
@@ -42,19 +43,24 @@ async function fetchWithAuth(endpoint, options = {}) {
  */
 export const authApi = {
   // Redirect to the backend for Spotify login
-  login: () => {
+  // login: async () => {
+  //   try {
+  //     const response = await fetch(`${API_BASE_URL}/spotify/auth/login`);
+  //     console.log('Response:', response);
+  //     if (!response.ok) {
+  //       throw new Error(`HTTP error! status: ${response.status}`);
+  //     }
+  //     return await response.json();
+  //   } catch (error) {
+  //     console.error('Login fetch error:', error);
+  //     throw error;
+  //   }
+  // },
+  
+  login: async () => {
     // Redirect to the backend for Spotify login
     window.location.href = `${API_BASE_URL}/spotify/auth/login`;
   },
-  // login: async () => {
-  //   const response = await fetch(`${API_BASE_URL}/spotify/auth/login`);
-  //   if (response.ok) {
-  //     const data = await response.json();
-  //     return data['access_token'];
-  // }
-  //   throw new Error('Failed to initiate login');
-
-// },
 
   // Check if the user is authenticated
   isAuthenticated: async () => {
@@ -100,24 +106,42 @@ export const spotifyApi = {
   
   fetchSavedAlbums: async (access_token) => {
     // Fetch saved albums from Spotify API
-    const response = await fetch('https://api.spotify.com/v1/me/albums?limit=50', {
+    const response = await fetch(`${API_BASE_URL}/spotify/me/albums?access_token=${access_token}`, {
+      method: 'GET',
       headers: {
-        Authorization: `Bearer ${access_token}`,
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${access_token}`, // Pass the access token in the Authorization header
       },
     });
     if (!response.ok) {
       throw new Error('Failed to fetch saved albums');
     }
     const data = await response.json();
-    return data.items.map((item) => ({
+    console.log('Fetched saved albums:', data);
+    return data;
+  },
+
+  getSavedAlbums: async (access_token ) => {
+  const raw_data = await spotifyApi.fetchSavedAlbums(access_token);
+    return raw_data.albums.map((item) => ({
       id: item.album.id,
       name: item.album.name,
       artists: item.album.artists.map((artist) => artist.name).join(', '),
-      images: item.album.images,
+      images: {
+        big: item.album.images[0]?.url || null, // Largest image
+        medium: item.album.images[1]?.url || null, // Medium-sized image
+        small: item.album.images[2]?.url || null, // Smallest image
+      },
+      label: item.album.label,
+      releaseDate: item.album.release_date,
+      totalTracks: item.album.total_tracks,
+      popularity: item.album.popularity,
+      addedAt: item.added_at, // When the album was added to the user's library
     }));
   }
-  
 };
+
+
 
 /**
  * Recommendations API calls

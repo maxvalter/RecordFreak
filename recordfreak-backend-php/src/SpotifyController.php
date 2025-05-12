@@ -5,7 +5,6 @@ class SpotifyController
     private $clientId;
     private $clientSecret;
     private $redirectUri;
-    private $accessToken = null;
 
     private $refreshToken = null;
 
@@ -70,10 +69,11 @@ class SpotifyController
         $code = $_GET['code'] ?? null;
 
         if (!$code) {
-            echo json_encode(['error' => 'Authorization code is missing']);
-            return;
+            // Redirect to frontend with an error message
+            header("Location: http://localhost:8000?error=Authorization code is missing");
+            exit;
         }
-        error_log("Authorization code:");
+
         $tokenUrl = 'https://accounts.spotify.com/api/token';
         $postData = [
             'grant_type' => 'authorization_code',
@@ -96,13 +96,17 @@ class SpotifyController
 
         if (isset($data['access_token'])) {
             $this->accessToken = $data['access_token'];
-            echo json_encode(['message' => 'Authentication successful', 'access_token' => $this->accessToken]);
-        } else {
-            echo json_encode(['error' => 'Failed to obtain access token']);
-        }
+            $this->refreshToken = $data['refresh_token'];
+            $this->loggedIn = true;
 
-        $this->refreshToken = $data['refresh_token'];
-        $this->loggedIn = true;
+            // Redirect to frontend with the access token
+            header("Location: http://localhost:8000?access_token=" . urlencode($this->accessToken));
+            exit;
+        } else {
+            // Redirect to frontend with an error message
+            header("Location: http://localhost:8000?error=Failed to obtain access token");
+            exit;
+        }
     }
 
     public function success()
@@ -140,11 +144,29 @@ class SpotifyController
 
     public function fetchSavedAlbums()
     {
-        session_start();
-        if (!isset($_SESSION['spotify_access_token'])) {
-            echo json_encode(['error' => 'Access token is missing']);
-            return;
-        }
+        //Mock albums returned
+        //Accesstoken returned from the login method
+
+
+        $accessToken = $_GET['access_token'] ?? null;
+        // $mockAlbums = [
+        //     [
+        //         'album' => [
+        //             'name' => 'Album 1',
+        //             'artists' => [['name' => 'Artist 1']],
+        //             'images' => [['url' => 'https://example.com/image1.jpg']],
+        //         ],
+        //     ],
+        //     [
+        //         'album' => [
+        //             'name' => 'Album 2',
+        //             'artists' => [['name' => 'Artist 2']],
+        //             'images' => [['url' => 'https://example.com/image2.jpg']],
+        //         ],
+        //     ],
+        // ];
+
+        // echo json_encode(['albums' => $mockAlbums, 'access_token' => $accessToken]);
 
         $url = $this->spotifyApiBaseUrl . '/me/albums';
 
@@ -152,7 +174,7 @@ class SpotifyController
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_HTTPHEADER, [
-            'Authorization: Bearer ' . $_SESSION['spotify_access_token'],
+            'Authorization: Bearer ' . $accessToken,
             'Content-Type: application/json',
         ]);
 

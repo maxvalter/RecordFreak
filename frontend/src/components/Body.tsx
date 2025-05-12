@@ -3,18 +3,22 @@ import { Album } from "../types/Album";
 import "../styles/Body.css";
 import { spotifyApi } from "../api/apiClient";
 
-export default function Body() {
+interface BodyProps {
+  accessToken: string;
+}
+
+export default function Body({ accessToken }: BodyProps) {
   const [albums, setAlbums] = useState<Album[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [refreshTrigger, setRefreshTrigger] = useState<number>(0);
 
   // Fetch saved albums function
-  const fetchAlbums = useCallback(async () => {
+  const getAlbums = useCallback(async () => {
     try {
       setLoading(true);
-      const data = await spotifyApi.fetchSavedAlbums();
-      setAlbums(data.items); // Assuming `data.items` contains the list of albums
+      const data = await spotifyApi.getSavedAlbums(accessToken);
+      setAlbums(data); // Assuming `data.items` contains the list of albums
     } catch (err) {
       if (err instanceof Error) {
         setError(err.message);
@@ -27,15 +31,15 @@ export default function Body() {
   }, []);
 
   useEffect(() => {
-    fetchAlbums();
-  }, [fetchAlbums]);
+    getAlbums();
+  }, [getAlbums]);
 
   // Refetch when refreshTrigger changes (e.g., when a new album is saved)
   useEffect(() => {
     if (refreshTrigger > 0) {
-      fetchAlbums();
+      getAlbums();
     }
-  }, [refreshTrigger, fetchAlbums]);
+  }, [refreshTrigger, getAlbums]);
 
   // Callback for when an album is saved
   const handleAlbumSaved = () => {
@@ -73,16 +77,14 @@ export default function Body() {
               <div key={album.id} className="album-card">
                 <div className="album-image-container">
                   <img
-                    src={album.images[0]?.url}
+                    src={album.images.big}
                     alt={album.name}
                     className="album-image"
                   />
                 </div>
                 <div className="album-details">
                   <h3 className="album-title">{album.name}</h3>
-                  <p className="album-artist">
-                    {album.artists.map((artist) => artist.name).join(", ")}
-                  </p>
+                  <p className="album-artist">{album.artists}</p>
                   <p className="album-date">
                     Added: {new Date(album.added_at).toLocaleDateString()}
                   </p>

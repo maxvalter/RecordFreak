@@ -13,8 +13,7 @@ export default function Login() {
   const handleLogin = async () => {
     try {
       setLoading(true);
-      await authApi.login();
-      // No need to set loading to false as we're redirecting away
+      const token = await authApi.login();
     } catch (error) {
       console.error("Failed to redirect:", error);
       setError("Failed to start login process. Please try again.");

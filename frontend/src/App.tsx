@@ -1,56 +1,32 @@
-import React, { useState, useEffect } from "react";
-import { Routes, Route, useLocation, useNavigate } from "react-router-dom";
-import Login from "./components/Login";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Body from "./components/Body";
-import { authApi } from "./api/apiClient";
-import { mainModule } from "process";
+import Login from "./components/Login";
 
-// Callback component to handle Spotify redirect
-function CallbackHandler() {
+function App() {
+  const [accessToken, setAccessToken] = useState<string | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Just redirect to home where the token logic is handled
-    navigate("/");
-  }, [navigate]);
+    // Extract the access token from the URL
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get("access_token");
 
-  return <div className="loading">Processing authentication...</div>;
-}
-
-function App() {
-  const [loading, setLoading] = useState(true);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-  useEffect(() => {
-    async function checkAuth() {
-      try {
-        setLoading(true);
-        const authStatus = await authApi.isAuthenticated();
-        setIsAuthenticated(authStatus);
-      } catch (error) {
-        console.error("Failed to check authentication:", error);
-        setIsAuthenticated(false);
-      } finally {
-        setLoading(false);
-      }
+    if (token) {
+      setAccessToken(token);
+      // Clear the token from the URL
+      navigate("/", { replace: true });
     }
-
-    checkAuth();
-  }, []);
-
-  if (loading) {
-    return <div className="loading">Loading...</div>;
-  }
+  }, [navigate]);
 
   return (
     <div className="app-container">
       <header>
         <h1>RecordFreak</h1>
       </header>
-      <main>{isAuthenticated ? <Body /> : <Login />}</main>
-      {/* <main>
-        <Login />
-      </main> */}
+      <main>
+        {accessToken ? <Body accessToken={accessToken} /> : <Login />}
+      </main>
     </div>
   );
 }
