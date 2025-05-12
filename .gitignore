@@ -1,0 +1,4 @@
+.env
+.DS_Store
+recordfreak-backend-php/vendor
+recordfreak-backend-php/composer.*

@@ -1,4 +1,10 @@
 <?php
+
+require_once __DIR__ . '/../vendor/autoload.php'; // Ensure Composer's autoloader is included
+
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../');
+$dotenv->load();
+
 class SpotifyController
 {
     private $spotifyApiBaseUrl = 'https://api.spotify.com/v1';
@@ -13,10 +19,8 @@ class SpotifyController
 
     public function __construct()
     {
-        $this->loadEnv();
-        // $this->clientId = getenv('SPOTIFY_CLIENT_ID');
-        $this->clientId = '077b0a8f569941c1af45cc2a893eddfa';
-        $this->clientSecret = '510a2d6558b44628a0aedd52a9416b6e';
+        $this->clientId = $_ENV['SPOTIFY_CLIENT_ID'];
+        $this->clientSecret = $_ENV['SPOTIFY_CLIENT_SECRET'];
         $this->redirectUri = 'http://localhost:5000/auth/callback';
     }
 
